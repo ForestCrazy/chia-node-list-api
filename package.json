@@ -17,6 +17,7 @@
     "author": "ForestCrazy",
     "license": "GPL-3.0",
     "dependencies": {
-        "express": "^4.17.1"
+        "express": "^4.17.1",
+        "mongodb": "^3.6.8"
     }
 }

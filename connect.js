@@ -26,6 +26,8 @@ async function connectToDatabase(uri) {
     return db
 }
 
-const db = await connectToDatabase(process.env.MONGODB_URI)
+module.exports = async() => {
+    const db = await connectToDatabase(process.env.MONGODB_URI)
 
-exports.db = db
+    return db
+}
