@@ -97,8 +97,9 @@ app.post('/node', async(req, res) => {
                     })
                 }
             } else {
-                res.statusCode = 1010
+                res.statusCode = 400
                 res.json({
+                    code: 1010,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
@@ -148,8 +149,9 @@ app.patch('/node', async(req, res) => {
                     })
                 }
             } else {
-                res.statusCode = 1010
+                res.statusCode = 400
                 res.json({
+                    code: 1010,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
@@ -170,28 +172,32 @@ app.put('/node', async(req, res) => {
     res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate')
     try {
         var db = await connectToDatabase(process.env.MONGODB_URI)
+        let form = new multiparty.Form();
 
-        if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(req.body.node_ip) && /^-?\d+$/.test(req.body.node_port)) {
-            await db.collection('node').update({
-                node_ip: req.body.node_ip
-            }, {
-                node_ip: req.body.node_ip,
-                node_port: parseInt(req.node_port),
-                last_active: Math.floor(new Date().getTime() / 1000)
-            }, {
-                upsert: true
-            })
-            res.json({
-                msg: 'active node success',
-                success: true
-            })
-        } else {
-            res.statusCode = 1010
-            res.json({
-                msg: 'ip pattern is not match or port is not number',
-                success: false
-            })
-        }
+        form.parse(req, async function(err, fields, files) {
+            if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(fields.node_ip[0]) && /^-?\d+$/.test(fields.node_port[0])) {
+                await db.collection('node').update({
+                    node_ip: fields.node_ip[0]
+                }, {
+                    node_ip: fields.node_ip[0],
+                    node_port: parseInt(fields.node_port[0]),
+                    last_active: Math.floor(new Date().getTime() / 1000)
+                }, {
+                    upsert: true
+                })
+                res.json({
+                    msg: 'active node success',
+                    success: true
+                })
+            } else {
+                res.statusCode = 400
+                res.json({
+                    code: 1010,
+                    msg: 'ip pattern is not match or port is not number',
+                    success: false
+                })
+            }
+        });
     } catch (except) {
         res.statusCode = 533
         res.json({
