@@ -42,7 +42,7 @@ app.use(bodyParser.json())
 
 app.all('/', (req, res) => {
     res.json({
-        msg: 'path not found. API Document https://github.com/ForestCrazy/chia-node-list-api'
+        msg: 'path not found. API Document https://github.com/ForestCrazy/chia-node-list-api/blob/main/README.md'
     })
 })
 
@@ -50,11 +50,16 @@ app.get('/node', async(req, res) => {
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate')
+    var limit = 100
+    if (parseInt(req.query.limit) != limit && /^-?\d+$/.test(req.query.limit)) {
+        limit = parseInt(req.query.limit)
+    }
     try {
         var db = await connectToDatabase(process.env.MONGODB_URI)
-        const node = await db.collection('node').find({}).sort({ last_active: -1 }).toArray()
+        const node = await db.collection('node').find({}).sort({ last_active: -1 }).limit(limit).toArray()
         res.json({ node })
     } catch (except) {
+        res.statusCode = 530
         res.json({
             msg: 'failed to connect to database',
             success: true
@@ -92,6 +97,7 @@ app.post('/node', async(req, res) => {
                     })
                 }
             } else {
+                res.statusCode = 1010
                 res.json({
                     msg: 'ip pattern is not match or port is not number',
                     success: false
@@ -99,7 +105,7 @@ app.post('/node', async(req, res) => {
             }
         });
     } catch (except) {
-        console.log(except)
+        res.statusCode = 531
         res.json({
             msg: 'failed to insert node into database',
             success: false
@@ -142,6 +148,7 @@ app.patch('/node', async(req, res) => {
                     })
                 }
             } else {
+                res.statusCode = 1010
                 res.json({
                     msg: 'ip pattern is not match or port is not number',
                     success: false
@@ -149,7 +156,7 @@ app.patch('/node', async(req, res) => {
             }
         });
     } catch (except) {
-        console.log(except)
+        res.statusCode = 532
         res.json({
             msg: 'failed to active node',
             success: false
@@ -181,6 +188,7 @@ app.put('/node', async(req, res) => {
                     success: true
                 })
             } else {
+                res.statusCode = 1010
                 res.json({
                     msg: 'ip pattern is not match or port is not number',
                     success: false
@@ -188,7 +196,7 @@ app.put('/node', async(req, res) => {
             }
         });
     } catch (except) {
-        console.log(except)
+        res.statusCode = 533
         res.json({
             msg: 'failed to active this node',
             success: false
@@ -198,7 +206,7 @@ app.put('/node', async(req, res) => {
 
 app.use((req, res, next) => {
     res.json({
-        msg: 'path not found. API Document https://github.com/ForestCrazy/chia-node-list-api'
+        msg: 'path not found. API Document https://github.com/ForestCrazy/chia-node-list-api/blob/main/README.md'
     })
 });
 
