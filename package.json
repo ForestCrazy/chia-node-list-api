@@ -1,0 +1,22 @@
+{
+    "name": "chia-node-list-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js"
+    },
+    "keywords": [
+        "chia",
+        "chia-blockchain",
+        "chia-node",
+        "chia-api",
+        "chia-peer"
+    ],
+    "author": "ForestCrazy",
+    "license": "GPL-3.0",
+    "dependencies": {
+        "express": "^4.17.1"
+    }
+}
