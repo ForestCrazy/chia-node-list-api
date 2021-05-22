@@ -24,6 +24,8 @@ Get node list
 ```
 POST /node
 ```
+> form-data
+
 insert node
 
 **Parameters:**
@@ -36,6 +38,8 @@ insert node
 ```
 PATCH /node
 ```
+> form-data
+
 active node
 
 **Parameters:**
@@ -48,6 +52,7 @@ active node
 ```
 PUT /node
 ```
+> raw - json
 
 **Parameters:**
 |Name|Type|Mandatory|Description|
