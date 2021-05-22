@@ -32,7 +32,7 @@ const app = express();
 
 app.all('/', (req, res) => {
     res.json({
-        "err": 'path not found. <a href="./">API Document</a>'
+        "err": 'path not found. API Document https://github.com/ForestCrazy/chia-node-list-api'
     })
 })
 
@@ -41,10 +41,10 @@ app.get('/node', async(req, res) => {
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate')
     const db = await connectToDatabase(process.env.MONGODB_URI)
-    const node = await db.collection('node').find({}).toArray()['node']
+    const node = await db.collection('node').find({}).toArray()
     res.json({ node })
 });
 
 const port = process.env.PORT || 80;
 
-app.listen(port, () => console.log(`Server running on ${port}, http://localhost:${port}`));
+app.listen(port, () => console.log(`Server running on ${port}`));
