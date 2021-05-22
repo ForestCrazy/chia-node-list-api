@@ -57,7 +57,7 @@ app.get('/node', async(req, res) => {
     try {
         var db = await connectToDatabase(process.env.MONGODB_URI)
         const node = await db.collection('node').find({}).sort({ last_active: -1 }).limit(limit).toArray()
-        res.json({ node })
+        res.json(node)
     } catch (except) {
         res.statusCode = 530
         res.json({
