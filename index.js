@@ -97,8 +97,9 @@ app.post('/node', async(req, res) => {
                     })
                 }
             } else {
-                res.statusCode = 1010
+                res.statusCode = 400
                 res.json({
+                    code: 1010,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
@@ -148,8 +149,9 @@ app.patch('/node', async(req, res) => {
                     })
                 }
             } else {
-                res.statusCode = 1010
+                res.statusCode = 400
                 res.json({
+                    code: 1010,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
@@ -188,8 +190,9 @@ app.put('/node', async(req, res) => {
                     success: true
                 })
             } else {
-                res.statusCode = 1010
+                res.statusCode = 400
                 res.json({
+                    code: 1010,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
