@@ -52,7 +52,7 @@ active node
 ```
 PUT /node
 ```
-> raw - json
+> form-data
 
 **Parameters:**
 |Name|Type|Mandatory|Description|
