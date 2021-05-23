@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const multiparty = require('multiparty');
 // Import Dependencies
@@ -37,6 +38,7 @@ async function connectToDatabase(uri) {
 
 const app = express();
 
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
