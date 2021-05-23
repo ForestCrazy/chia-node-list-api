@@ -78,31 +78,49 @@ app.post('/node', async(req, res) => {
         let form = new multiparty.Form();
 
         form.parse(req, async function(err, fields, files) {
-            if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(fields.node_ip[0]) && /^-?\d+$/.test(fields.node_port[0])) {
-                const node = await db.collection('node').find({
-                    node_ip: fields.node_ip[0]
-                }).toArray()
-                if (node.length > 0) {
-                    res.json({
-                        msg: 'this node is already inserted',
-                        success: false
-                    })
+            if (fields) {
+                if (fields.node_ip[0] !== undefined && fields.node_port[0] !== undefined) {
+                    if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(fields.node_ip[0]) && /^-?\d+$/.test(fields.node_port[0])) {
+                        const node = await db.collection('node').find({
+                            node_ip: fields.node_ip[0]
+                        }).toArray()
+                        if (node.length > 0) {
+                            res.json({
+                                msg: 'this node is already inserted',
+                                success: false
+                            })
+                        } else {
+                            await db.collection('node').insert({
+                                node_ip: fields.node_ip[0],
+                                node_port: parseInt(fields.node_port[0])
+                            });
+                            res.json({
+                                msg: 'insert node successfully',
+                                timestamp: Math.floor(new Date().getTime() / 1000),
+                                success: true
+                            })
+                        }
+                    } else {
+                        res.statusCode = 400
+                        res.json({
+                            code: 1011,
+                            msg: 'ip pattern is not match or port is not number',
+                            success: false
+                        })
+                    }
                 } else {
-                    await db.collection('node').insert({
-                        node_ip: fields.node_ip[0],
-                        node_port: parseInt(fields.node_port[0])
-                    });
+                    res.statusCode = 400
                     res.json({
-                        msg: 'insert node successfully',
-                        timestamp: Math.floor(new Date().getTime() / 1000),
-                        success: true
+                        code: 1010,
+                        msg: 'form data is null',
+                        success: false
                     })
                 }
             } else {
                 res.statusCode = 400
                 res.json({
                     code: 1010,
-                    msg: 'ip pattern is not match or port is not number',
+                    msg: 'form data is null',
                     success: false
                 })
             }
@@ -153,7 +171,7 @@ app.patch('/node', async(req, res) => {
             } else {
                 res.statusCode = 400
                 res.json({
-                    code: 1010,
+                    code: 1011,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
@@ -194,7 +212,7 @@ app.put('/node', async(req, res) => {
             } else {
                 res.statusCode = 400
                 res.json({
-                    code: 1010,
+                    code: 1011,
                     msg: 'ip pattern is not match or port is not number',
                     success: false
                 })
@@ -215,6 +233,6 @@ app.use((req, res, next) => {
     })
 });
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 
 app.listen(port, () => console.log(`Server running on ${port}`));
