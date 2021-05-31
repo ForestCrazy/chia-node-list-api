@@ -36,6 +36,35 @@ async function connectToDatabase(uri) {
     return db
 }
 
+function checkLastHeightBlock(node_input, node_db = {}) {
+    if (node_input.hasOwnProperty('node_height')) {
+        if (/^-?\d+$/.test(parseInt(node_input.node_height[0]))) {
+            node_input.node_height = parseInt(node_input.node_height[0])
+        } else {
+            node_input.node_height = false
+        }
+    } else {
+        node_input.node_height = false
+    }
+    if (node_db.hasOwnProperty('node_height')) {
+        if (node_input.height) {
+            if (node_input.node_height >= node_db.node_height) {
+                return node_input.node_height
+            } else {
+                return node_db.node_height
+            }
+        } else {
+            return node_db.node_height
+        }
+    } else {
+        if (node_input.node_height) {
+            return parseInt(node_input.node_height)
+        } else {
+            return 0
+        }
+    }
+}
+
 const app = express();
 
 app.use(cors())
@@ -92,7 +121,9 @@ app.post('/node', async(req, res) => {
                         } else {
                             await db.collection('node').insert({
                                 node_ip: fields.node_ip[0],
-                                node_port: parseInt(fields.node_port[0])
+                                node_port: parseInt(fields.node_port[0]),
+                                node_height: checkLastHeightBlock(fields),
+                                last_active: Math.floor(new Date().getTime() / 1000)
                             });
                             res.json({
                                 msg: 'insert node successfully',
@@ -147,7 +178,8 @@ app.patch('/node', async(req, res) => {
                 if (fields.node_ip[0] !== undefined && fields.node_port[0] !== undefined) {
                     if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(fields.node_ip[0]) && /^-?\d+$/.test(fields.node_port[0])) {
                         const node = await db.collection('node').find({
-                            node_ip: fields.node_ip[0]
+                            node_ip: fields.node_ip[0],
+                            node_port: fields.node_port[0]
                         }).toArray()
                         if (node.length > 0) {
                             const UpdateNode = await db.collection('node').update({
@@ -156,6 +188,7 @@ app.patch('/node', async(req, res) => {
                             }, {
                                 node_ip: fields.node_ip[0],
                                 node_port: parseInt(fields.node_port[0]),
+                                node_height: checkLastHeightBlock(fields, node),
                                 last_active: Math.floor(new Date().getTime() / 1000)
                             }, {
                                 upsert: false
@@ -216,11 +249,16 @@ app.put('/node', async(req, res) => {
             if (fields) {
                 if (fields.node_ip[0] !== undefined && fields.node_port[0] !== undefined) {
                     if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(fields.node_ip[0]) && /^-?\d+$/.test(fields.node_port[0])) {
+                        const node = await db.collection('node').findOne({
+                            node_ip: fields.node_ip[0],
+                            node_port: fields.node_port[0]
+                        }, {})
                         await db.collection('node').update({
                             node_ip: fields.node_ip[0]
                         }, {
                             node_ip: fields.node_ip[0],
                             node_port: parseInt(fields.node_port[0]),
+                            node_height: checkLastBlockHeight(fields, node),
                             last_active: Math.floor(new Date().getTime() / 1000)
                         }, {
                             upsert: true
