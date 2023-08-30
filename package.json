@@ -21,7 +21,7 @@
         "cors": "^2.8.5",
         "dotenv": "^10.0.0",
         "express": "^4.18.2",
-        "mongodb": "^3.6.8",
+        "mongodb": "^3.6.10",
         "multiparty": "^4.2.2"
     }
 }
